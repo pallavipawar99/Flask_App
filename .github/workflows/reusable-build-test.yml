@@ -1,0 +1,31 @@
+name: Reusable Build & Test
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        type: string
+        default: '3.10'
+      run_tests:
+        type: boolean
+        default: true
+    outputs:
+      test_result:
+        value: ${{ jobs.test.outputs.status }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.set-status.outputs.status }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python_version: ${{ inputs.python_version }}
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Pytest
+        if: ${{ inputs.run_tests }}
+        run: pytest
+      - id: set-status
+        run: echo "status=passed" >> $GITHUB_OUTPUT

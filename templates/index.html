@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask SPA</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #response { margin-top: 20px; color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Flask App</h2>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button onclick="sendData()">Submit</button>
+    <p id="response"></p>
+</div>
+
+<script>
+    async function sendData() {
+        const nameValue = document.getElementById('nameInput').value;
+        const responseElement = document.getElementById('response');
+
+        if (!nameValue) {
+            responseElement.style.color = "red";
+            responseElement.innerText = "Please enter a name!";
+            return;
+        }
+
+        try {
+            const response = await fetch('/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: nameValue })
+            });
+
+            const result = await response.json();
+            responseElement.style.color = "#28a745";
+            responseElement.innerText = result.message;
+        } catch (error) {
+            responseElement.style.color = "red";
+            responseElement.innerText = "Error connecting to server.";
+        }
+    }
+</script>
+
+</body>
+</html>
