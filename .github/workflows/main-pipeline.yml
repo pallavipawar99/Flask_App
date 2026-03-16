@@ -1,0 +1,28 @@
+name: Main Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 1. Call the reusable workflow
+  run-build-and-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      python_version: "3.11"
+      run_tests: true
+
+  # 2. Use the output from the reusable workflow
+  check-results:
+    needs: run-build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Result
+        run: |
+          echo "The test result was: ${{ needs.run-build-and-test.outputs.test_result }}"
+          
+      - name: Fail if tests failed
+        if: ${{ needs.run-build-and-test.outputs.test_result == 'failed' }}
+        run: exit 1
